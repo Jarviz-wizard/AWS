@@ -1,0 +1,43 @@
+pip install moviepy gtts
+import os
+from gtts import gTTS
+from moviepy.editor import VideoFileClip, TextClip, AudioFileClip, CompositeVideoClip
+
+# Function to create audio from text
+def text_to_audio(text, audio_file):
+    tts = gTTS(text=text, lang='en')
+    tts.save(audio_file)
+
+# Function to create video from text and audio
+def create_video(text, audio_file, output_file):
+    # Create a text clip
+    text_clip = TextClip(text, fontsize=70, color='white', bg_color='black', size=(1280, 720))
+    text_clip = text_clip.set_duration(10)  # Set duration of the text display
+
+    # Load audio file
+    audio_clip = AudioFileClip(audio_file)
+
+    # Create a video clip with a static background (black screen)
+    background_clip = VideoFileClip("background.jpg").subclip(0, 10)  # Use a 10-second background image
+
+    # Combine text and audio into one video clip
+    video = CompositeVideoClip([background_clip, text_clip.set_position('center')])
+    video = video.set_audio(audio_clip)
+
+    # Write the result to a file
+    video.write_videofile(output_file, fps=24)
+
+# Main function
+if __name__ == "__main__":
+    input_text = "Welcome to our AI Video Generator!"
+    audio_file = "output.mp3"
+    output_file = "output_video.mp4"
+
+    # Generate audio from text
+    text_to_audio(input_text, audio_file)
+
+    # Create video from text and audio
+    create_video(input_text, audio_file, output_file)
+
+    # Clean up the generated audio file
+    os.remove(audio_file)
